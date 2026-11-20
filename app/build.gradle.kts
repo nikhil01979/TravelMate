@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
 }
 
+// Android configuration
 android {
     namespace = "com.example.travelmate"
     compileSdk = 36
@@ -19,9 +22,29 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Maps API key
+        val properties = Properties()
+        val localFile = rootProject.file("local.properties")
+
+        if (localFile.exists()) {
+            localFile.inputStream().use {
+                properties.load(it)
+            }
+        }
+
+        val mapsKey =
+            properties.getProperty("MAPS_API_KEY", "")
+
+        // API key setup
+        manifestPlaceholders["MAPS_API_KEY"] = mapsKey
+        buildConfigField(
+            "String",
+            "MAPS_API_KEY",
+            "\"$mapsKey\""
+        )
     }
 
-    // Build settings
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -38,18 +61,19 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    // Kotlin settings
     kotlinOptions {
         jvmTarget = "11"
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
-// App dependencies
 dependencies {
+
+    // Core libraries
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -58,11 +82,17 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Unit testing
     testImplementation(libs.junit)
+
+    // UI testing
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Debug tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -72,9 +102,23 @@ dependencies {
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
 
-    // Firebase
+    // Firebase authentication
     implementation(libs.firebase.auth)
 
     // Material icons
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Places SDK
+    implementation(libs.places)
+
+    // Maps Compose
+    implementation(libs.maps.compose)
+
+    // Firebase platform
+    implementation(platform(libs.firebase.bom))
+    implementation("com.google.firebase:firebase-auth")
+    implementation(libs.firebase.firestore)
+
+    // Maps utilities
+    implementation("com.google.maps.android:maps-ktx:5.1.1")
 }

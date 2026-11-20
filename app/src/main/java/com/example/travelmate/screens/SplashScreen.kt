@@ -111,6 +111,7 @@ fun SplashScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Footer Text
             Text(
                 text = "PREPARING YOUR ADVENTURE",
                 fontSize = 10.sp,

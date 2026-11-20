@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-// Authentication data
+
 data class AuthState(
     val isLoading: Boolean = false,
     val isAuthenticated: Boolean = false,
@@ -13,31 +14,35 @@ data class AuthState(
     val successMessage: String? = null
 )
 
+// Authentication ViewModel
 class AuthViewModel : ViewModel() {
 
-    // Firebase authentication
+    // Firebase instance
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    // Stores auth state
+    // Authentication state
     private val _authState = MutableStateFlow(
         AuthState(
             isAuthenticated = auth.currentUser != null
         )
     )
-    val authState: StateFlow<AuthState> = _authState
 
-    // Registers new users
+    val authState: StateFlow<AuthState> = _authState.asStateFlow()
+
+    // Register new users
     fun register(email: String, password: String) {
-        // Checks empty email
+
+        // Validate email
         if (email.isBlank()) {
             _authState.value = AuthState(
                 errorMessage = "Please enter your email address."
             )
             return
         }
-        // Validates email format
+
+        // Check email format
         if (!android.util.Patterns.EMAIL_ADDRESS
-                .matcher(email)
+                .matcher(email.trim())
                 .matches()
         ) {
             _authState.value = AuthState(
@@ -45,27 +50,35 @@ class AuthViewModel : ViewModel() {
             )
             return
         }
-        // Checks password length
+
+        // Validate password
         if (password.length < 6) {
             _authState.value = AuthState(
                 errorMessage = "Password must contain at least 6 characters."
             )
             return
         }
-        // Starts registration
+
+        // Set loading state
         _authState.value = AuthState(isLoading = true)
+
+        // Create Firebase account
         auth.createUserWithEmailAndPassword(
             email.trim(),
             password
         ).addOnCompleteListener { task ->
-            // Checks registration result
+
             if (task.isSuccessful) {
 
+                // Registration success
                 _authState.value = AuthState(
                     isAuthenticated = true,
                     successMessage = "Account created successfully."
                 )
+
             } else {
+
+                // Registration failure
                 _authState.value = AuthState(
                     errorMessage = task.exception?.message
                         ?: "Registration failed."
@@ -74,29 +87,37 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    // Logs in users
+    // Login existing users
     fun login(email: String, password: String) {
-        // Checks empty fields
+
+        // Validate credentials
         if (email.isBlank() || password.isBlank()) {
             _authState.value = AuthState(
                 errorMessage = "Please enter your email and password."
             )
             return
         }
-        // Starts login
+
+        // Set loading state
         _authState.value = AuthState(isLoading = true)
+
+        // Authenticate user
         auth.signInWithEmailAndPassword(
             email.trim(),
             password
         ).addOnCompleteListener { task ->
-            // Checks login result
+
             if (task.isSuccessful) {
+
+                // Login success
                 _authState.value = AuthState(
                     isAuthenticated = true,
                     successMessage = "Login successful."
                 )
 
             } else {
+
+                // Login failure
                 _authState.value = AuthState(
                     errorMessage = task.exception?.message
                         ?: "Login failed."
@@ -105,17 +126,21 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    // Logs out users
+    // Logout current user
     fun logout() {
+
         auth.signOut()
+
+        // Reset authentication
         _authState.value = AuthState(
             isAuthenticated = false,
             successMessage = "You have been logged out."
         )
     }
 
-    // Clears messages
+    // Clear status messages
     fun clearMessage() {
+
         _authState.value = _authState.value.copy(
             errorMessage = null,
             successMessage = null

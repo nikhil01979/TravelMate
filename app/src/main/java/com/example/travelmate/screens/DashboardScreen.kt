@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.travelmate.viewmodel.AuthViewModel
 
-// colors
+// Dashboard colors
 private val DashNavy = Color(0xFF062B68)
 private val DashOrange = Color(0xFFFF7900)
 private val DashGray = Color(0xFF718096)
@@ -26,31 +26,41 @@ private val DashGray = Color(0xFF718096)
 @Composable
 fun DashboardScreen(
     authViewModel: AuthViewModel,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onExploreClick: () -> Unit,
+    onSavedPlacesClick: () -> Unit
 ) {
-    // Dashboard background
+
+    // Background container
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(Color.White, Color(0xFFF0F7FF))
+                    listOf(
+                        Color.White,
+                        Color(0xFFF0F7FF)
+                    )
                 )
             )
     ) {
-        // Main dashboard content
+
+        // Scrollable dashboard content
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp)
         ) {
+
             // Header section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
+                // Application title
                 Text(
                     "TravelMate",
                     fontSize = 25.sp,
@@ -59,23 +69,30 @@ fun DashboardScreen(
                 )
 
                 // Logout action
-                TextButton(onClick = {
-                    authViewModel.logout()
-                    onLogout()
-                }) {
+                TextButton(
+                    onClick = {
+                        authViewModel.logout()
+                        onLogout()
+                    }
+                ) {
                     Icon(
                         Icons.Default.Logout,
                         contentDescription = null,
                         tint = DashOrange
                     )
+
                     Spacer(Modifier.width(5.dp))
-                    Text("Logout", color = DashOrange)
+
+                    Text(
+                        "Logout",
+                        color = DashOrange
+                    )
                 }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(30.dp))
 
-            // Welcome message
+            // Welcome heading
             Text(
                 "Welcome to TravelMate!",
                 fontSize = 25.sp,
@@ -85,6 +102,7 @@ fun DashboardScreen(
 
             Spacer(Modifier.height(8.dp))
 
+            // Welcome description
             Text(
                 "Plan your journeys and manage your travel expenses with ease.",
                 fontSize = 14.sp,
@@ -108,12 +126,19 @@ fun DashboardScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
+                onClick = onExploreClick,
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White
                 ),
-                elevation = CardDefaults.cardElevation(2.dp)
+                elevation = CardDefaults.cardElevation(3.dp)
             ) {
-                Column(Modifier.padding(20.dp)) {
+
+                // Card content
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+
+                    // Travel icon
                     Icon(
                         Icons.Default.FlightTakeoff,
                         contentDescription = null,
@@ -123,8 +148,9 @@ fun DashboardScreen(
 
                     Spacer(Modifier.height(12.dp))
 
+                    // Card title
                     Text(
-                        "Travel Planning",
+                        "Explore Destinations",
                         fontSize = 19.sp,
                         fontWeight = FontWeight.Bold,
                         color = DashNavy
@@ -132,8 +158,9 @@ fun DashboardScreen(
 
                     Spacer(Modifier.height(6.dp))
 
+                    // Card description
                     Text(
-                        "Plan your trips and organise your travel details in one place.",
+                        "Search destinations, explore Google Maps and discover interesting places.",
                         fontSize = 14.sp,
                         color = DashGray,
                         lineHeight = 20.sp
@@ -141,12 +168,58 @@ fun DashboardScreen(
 
                     Spacer(Modifier.height(12.dp))
 
-                    // Feature availability
+                    // Navigation label
                     Text(
-                        "Coming Soon",
+                        "Explore Now →",
                         color = DashOrange,
-                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Saved places card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                onClick = onSavedPlacesClick,
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                elevation = CardDefaults.cardElevation(3.dp)
+            ) {
+
+                // Card content
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+
+                    // Favorite icon
+                    Icon(
+                        Icons.Default.Favorite,
+                        contentDescription = null,
+                        tint = DashOrange,
+                        modifier = Modifier.size(32.dp)
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // Card title
+                    Text(
+                        "Saved Destinations",
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = DashNavy
+                    )
+
+                    Spacer(Modifier.height(6.dp))
+
+                    // Card description
+                    Text(
+                        "View and manage your favourite travel destinations.",
+                        fontSize = 14.sp,
+                        color = DashGray
                     )
                 }
             }
@@ -162,7 +235,13 @@ fun DashboardScreen(
                 ),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
-                Column(Modifier.padding(20.dp)) {
+
+                // Card content
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+
+                    // Wallet icon
                     Icon(
                         Icons.Default.AccountBalanceWallet,
                         contentDescription = null,
@@ -172,6 +251,7 @@ fun DashboardScreen(
 
                     Spacer(Modifier.height(12.dp))
 
+                    // Card title
                     Text(
                         "Expense Management",
                         fontSize = 19.sp,
@@ -181,11 +261,11 @@ fun DashboardScreen(
 
                     Spacer(Modifier.height(6.dp))
 
+                    // Card description
                     Text(
                         "Keep track of your travel expenses and manage your budget easily.",
                         fontSize = 14.sp,
-                        color = DashGray,
-                        lineHeight = 20.sp
+                        color = DashGray
                     )
 
                     Spacer(Modifier.height(12.dp))
